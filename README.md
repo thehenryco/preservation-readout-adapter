@@ -5,8 +5,7 @@ Akhilesh,
 I put the first preservation readout adapter here:
 
 
-
-\[PASTE GITHUB LINK]
+(https://github.com/thehenryco/preservation-readout-adapter.git)](https://github.com/thehenryco/preservation-readout-adapter.git)
 
 
 
