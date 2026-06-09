@@ -1,0 +1,61 @@
+{
+  "preservation_readout": {
+    "source_trace_id": "DA-TRACE-2024-0042",
+    "source_system": "agent-orchestration-pipeline",
+    "analysis_timestamp": "2026-06-09T11:14:38.083464+00:00Z",
+    "preserved_object": "authority_to_act",
+    "single_source_truth": "The agent's authority must remain valid from approval through commit.",
+    "drift_statement": "The approval record (APPR-7741) survived, but the authority did not survive the path to commit. At step 3 (reference_frame_changed), the reference frame changed from policy_v2.3 to policy_v2.4 without reauthorization.",
+    "drift_points": [
+      {
+        "step_index": 3,
+        "event": "reference_frame_changed",
+        "timestamp": "2024-11-15T14:32:05Z",
+        "actor": "policy_engine",
+        "action": "policy_update_deployed",
+        "authority_at_step": "policy_v2.4"
+      },
+      {
+        "step_index": 4,
+        "event": "execution_continued",
+        "timestamp": "2024-11-15T14:32:06Z",
+        "actor": "orchestration_agent",
+        "action": "export_records_batch_1",
+        "authority_at_step": "policy_v2.3"
+      },
+      {
+        "step_index": 5,
+        "event": "commit_attempted",
+        "timestamp": "2024-11-15T14:32:08Z",
+        "actor": "orchestration_agent",
+        "action": "commit_export_to_destination",
+        "authority_at_step": "policy_v2.3"
+      }
+    ],
+    "failed_preservation_conditions": [
+      "reference_frame_continuity",
+      "evidence_freshness",
+      "hidden_commitment_prevention",
+      "rollback_viability",
+      "commit_eligibility",
+      "policy_continuity"
+    ],
+    "residuals": [
+      "policy_version: policy_v2.3 -> policy_v2.4",
+      "approval_record_APPR-7741_no_longer_covers_current_policy",
+      "agent continued under stale authority without reauthorization",
+      "commit attempted under policy_v2.3 after reference frame changed"
+    ],
+    "human_accountable_readout": "The agent did not fail because it acted randomly. It failed because the authority that made the action valid was not preserved through execution. The system correctly denied the commit.",
+    "closure_statement": "Preserve the authority, not just the approval.",
+    "reviewer_action": "Require reauthorization before commit when the reference frame changes, or fail closed.",
+    "trace_statistics": {
+      "total_steps": 6,
+      "continuity_breaks": 3,
+      "hidden_commitments": 1,
+      "rollback_decay_at_step": 5,
+      "final_status": "FAIL_CLOSED"
+    },
+    "receipt_status": "preservation_failed_system_caught"
+  }
+}

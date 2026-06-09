@@ -1,0 +1,14 @@
+{
+  "receipt": {
+    "type": "preservation_dual_receipt",
+    "timestamp": "2026-06-09T11:14:38.083464+00:00Z",
+    "trace_seal": "a75cc3af74475dc41b37685702e09f4ab171197ef1f80da25de9de2a087331a6",
+    "readout_seal": "8c4222d58f9007e3b9d3d47ae37639ce08d85e2fb7818e2905b5aa45a2a16dbc",
+    "combined_seal": "b6e70012a142a1d4d404fc44ee13aed3331148c2133c85b2670298124edeeb52",
+    "trace_id": "DA-TRACE-2024-0042",
+    "trace_steps": 6,
+    "preservation_status": "preservation_failed_system_caught",
+    "final_governance_status": "FAIL_CLOSED",
+    "verified": true
+  }
+}
