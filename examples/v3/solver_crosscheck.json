@@ -1,0 +1,185 @@
+{
+  "series_sum": {
+    "description": "Does the admissibility series converge?",
+    "partial_sums": [
+      0.95,
+      1.4,
+      1.4,
+      1.4,
+      1.4,
+      1.4
+    ],
+    "final_sum": 1.4,
+    "converges": true,
+    "verdict": "Admissibility series is stable"
+  },
+  "balance_distance": {
+    "description": "Distance from perfect governance at each step",
+    "distances": [
+      0.05,
+      2.3027,
+      2.4495,
+      2.4495,
+      2.4495,
+      2.4495
+    ],
+    "initial": 0.05,
+    "final": 2.4495,
+    "trend": "DIVERGING",
+    "verdict": "Governance moved away from equilibrium: 0.05 to 2.45"
+  },
+  "energy_gap": {
+    "description": "Energy difference between initial and final governance states",
+    "energies": [
+      3.1468,
+      2.05,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "gap": 1.1468,
+    "verdict": "Energy dropped from 3.15 to 2.0 — governance lost 36.4% of its energy"
+  },
+  "drift_step": {
+    "description": "Directional drift between consecutive governance states",
+    "drift_vectors": [
+      {
+        "from_step": 1,
+        "to_step": 2,
+        "drift": [
+          -1.0,
+          -0.5,
+          -1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1.0,
+          -1.0,
+          -1.0
+        ],
+        "magnitude": 2.2913
+      },
+      {
+        "from_step": 2,
+        "to_step": 3,
+        "drift": [
+          0.0,
+          -0.45,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "magnitude": 0.45
+      },
+      {
+        "from_step": 3,
+        "to_step": 4,
+        "drift": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "magnitude": 0.0
+      },
+      {
+        "from_step": 4,
+        "to_step": 5,
+        "drift": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "magnitude": 0.0
+      },
+      {
+        "from_step": 5,
+        "to_step": 6,
+        "drift": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "magnitude": 0.0
+      }
+    ],
+    "max_drift_magnitude": 2.2913,
+    "verdict": "Largest single-step governance drift: 2.291 (step 1 to 2)"
+  },
+  "cycle_residual": {
+    "description": "Do authority cycles close through the trace?",
+    "closed_cycles": 1,
+    "broken_cycles": 5,
+    "total_cycles": 6,
+    "closure_ratio": 0.1667,
+    "verdict": "5 of 6 governance cycles failed to close — 83.0% cycle failure rate"
+  },
+  "euler_product": {
+    "description": "Product of admissibility scores across all steps",
+    "admissibilities": [
+      0.95,
+      0.45,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "product": 0.0,
+    "verdict": "Cumulative governance admissibility: 0.0 — approaching zero (governance failure cascade)"
+  },
+  "sphere_closure": {
+    "description": "Does the governance state remain on the 10D unit sphere?",
+    "norms": [
+      3.1468,
+      2.05,
+      2.0,
+      2.0,
+      2.0,
+      2.0
+    ],
+    "expected_norm": 3.1623,
+    "deviations": [
+      0.0155,
+      1.1123,
+      1.1623,
+      1.1623,
+      1.1623,
+      1.1623
+    ],
+    "verdict": "Governance norm collapsed from 3.15 to 2.0 (expected: 3.16) — state left the sphere at step 2"
+  },
+  "bounded_decision": {
+    "description": "What fraction of governance decisions stayed within admissible bounds?",
+    "bounded_steps": 1,
+    "total_steps": 6,
+    "ratio": 0.1667,
+    "verdict": "5 of 6 steps exceeded governance bounds — 83.0% boundary violation rate"
+  }
+}

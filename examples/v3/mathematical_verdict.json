@@ -1,0 +1,8 @@
+{
+  "stable": false,
+  "convergence": "DIVERGING",
+  "energy_collapse": 1.1468,
+  "cycle_failure_rate": 0.8333,
+  "recovery_requires": "reauthorization_with_identity_reset",
+  "without_intervention": "admissibility_decays_to_zero"
+}

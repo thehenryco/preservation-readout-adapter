@@ -1,0 +1,58 @@
+{
+  "atoms": 72,
+  "edges": 51,
+  "closed_cycles": 1,
+  "broken_cycles": 5,
+  "cycle_detail": [
+    {
+      "step": 1,
+      "name": "authorize",
+      "observer_closed": true,
+      "frame_closed": true,
+      "continuity_closed": true,
+      "fully_closed": true
+    }
+  ],
+  "broken_cycle_detail": [
+    {
+      "step": 2,
+      "name": "memory_read",
+      "observer_closed": false,
+      "frame_closed": true,
+      "continuity_closed": false,
+      "fully_closed": false
+    },
+    {
+      "step": 3,
+      "name": "tool_call",
+      "observer_closed": false,
+      "frame_closed": true,
+      "continuity_closed": false,
+      "fully_closed": false
+    },
+    {
+      "step": 4,
+      "name": "policy_mutation",
+      "observer_closed": false,
+      "frame_closed": false,
+      "continuity_closed": false,
+      "fully_closed": false
+    },
+    {
+      "step": 5,
+      "name": "retry",
+      "observer_closed": false,
+      "frame_closed": false,
+      "continuity_closed": false,
+      "fully_closed": false
+    },
+    {
+      "step": 6,
+      "name": "final_execute",
+      "observer_closed": false,
+      "frame_closed": false,
+      "continuity_closed": false,
+      "fully_closed": false
+    }
+  ]
+}

@@ -1,0 +1,1503 @@
+{
+  "analysis_type": "governance_state_space",
+  "engine": "The Henry Company — Mathematical Preservation Engine",
+  "trace_id": "constitutional_live_1779945146",
+  "agent_id": "agent_alice",
+  "session_id": "session_live",
+  "total_steps": 6,
+  "integrity_status": "CORRUPT",
+  "final_decision": "DENY",
+  "analysis_timestamp": "2026-06-09T13:36:56.165319+00:00",
+  "state_vectors": [
+    [
+      1.0,
+      0.95,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    [
+      0.0,
+      0.45,
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  ],
+  "topology": {
+    "atoms": 72,
+    "atom_detail": [
+      {
+        "id": "step_1_continuity_valid",
+        "step": 1,
+        "field": "continuity_valid",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_1_admissibility_score",
+        "step": 1,
+        "field": "admissibility_score",
+        "value": 0.95,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_1_authority_valid",
+        "step": 1,
+        "field": "authority_valid",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_1_hidden_commitment",
+        "step": 1,
+        "field": "hidden_commitment",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_1_rollback_viable",
+        "step": 1,
+        "field": "rollback_viable",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_1_evidence_fresh",
+        "step": 1,
+        "field": "evidence_fresh",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_1_ls_memory_valid",
+        "step": 1,
+        "field": "memory_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_1_ls_policy_valid",
+        "step": 1,
+        "field": "policy_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_1_ls_delegation_valid",
+        "step": 1,
+        "field": "delegation_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_1_ls_external_state_valid",
+        "step": 1,
+        "field": "external_state_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_1_observer",
+        "step": 1,
+        "field": "observer_identity",
+        "value": "dbc49ba9b0dd",
+        "type": "identity_hash"
+      },
+      {
+        "id": "step_1_frame",
+        "step": 1,
+        "field": "reference_frame",
+        "value": "cff9fa56f197",
+        "type": "frame_hash"
+      },
+      {
+        "id": "step_2_continuity_valid",
+        "step": 2,
+        "field": "continuity_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_2_admissibility_score",
+        "step": 2,
+        "field": "admissibility_score",
+        "value": 0.44999999999999996,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_2_authority_valid",
+        "step": 2,
+        "field": "authority_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_2_hidden_commitment",
+        "step": 2,
+        "field": "hidden_commitment",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_2_rollback_viable",
+        "step": 2,
+        "field": "rollback_viable",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_2_evidence_fresh",
+        "step": 2,
+        "field": "evidence_fresh",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_2_ls_memory_valid",
+        "step": 2,
+        "field": "memory_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_2_ls_policy_valid",
+        "step": 2,
+        "field": "policy_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_2_ls_delegation_valid",
+        "step": 2,
+        "field": "delegation_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_2_ls_external_state_valid",
+        "step": 2,
+        "field": "external_state_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_2_observer",
+        "step": 2,
+        "field": "observer_identity",
+        "value": "95e1c0464a01",
+        "type": "identity_hash"
+      },
+      {
+        "id": "step_2_frame",
+        "step": 2,
+        "field": "reference_frame",
+        "value": "cff9fa56f197",
+        "type": "frame_hash"
+      },
+      {
+        "id": "step_3_continuity_valid",
+        "step": 3,
+        "field": "continuity_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_3_admissibility_score",
+        "step": 3,
+        "field": "admissibility_score",
+        "value": 0.0,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_3_authority_valid",
+        "step": 3,
+        "field": "authority_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_3_hidden_commitment",
+        "step": 3,
+        "field": "hidden_commitment",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_3_rollback_viable",
+        "step": 3,
+        "field": "rollback_viable",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_3_evidence_fresh",
+        "step": 3,
+        "field": "evidence_fresh",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_3_ls_memory_valid",
+        "step": 3,
+        "field": "memory_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_3_ls_policy_valid",
+        "step": 3,
+        "field": "policy_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_3_ls_delegation_valid",
+        "step": 3,
+        "field": "delegation_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_3_ls_external_state_valid",
+        "step": 3,
+        "field": "external_state_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_3_observer",
+        "step": 3,
+        "field": "observer_identity",
+        "value": "e075b8e902a4",
+        "type": "identity_hash"
+      },
+      {
+        "id": "step_3_frame",
+        "step": 3,
+        "field": "reference_frame",
+        "value": "cff9fa56f197",
+        "type": "frame_hash"
+      },
+      {
+        "id": "step_4_continuity_valid",
+        "step": 4,
+        "field": "continuity_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_4_admissibility_score",
+        "step": 4,
+        "field": "admissibility_score",
+        "value": 0.0,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_4_authority_valid",
+        "step": 4,
+        "field": "authority_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_4_hidden_commitment",
+        "step": 4,
+        "field": "hidden_commitment",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_4_rollback_viable",
+        "step": 4,
+        "field": "rollback_viable",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_4_evidence_fresh",
+        "step": 4,
+        "field": "evidence_fresh",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_4_ls_memory_valid",
+        "step": 4,
+        "field": "memory_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_4_ls_policy_valid",
+        "step": 4,
+        "field": "policy_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_4_ls_delegation_valid",
+        "step": 4,
+        "field": "delegation_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_4_ls_external_state_valid",
+        "step": 4,
+        "field": "external_state_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_4_observer",
+        "step": 4,
+        "field": "observer_identity",
+        "value": "e075b8e902a4",
+        "type": "identity_hash"
+      },
+      {
+        "id": "step_4_frame",
+        "step": 4,
+        "field": "reference_frame",
+        "value": "33a6d6e0f3c3",
+        "type": "frame_hash"
+      },
+      {
+        "id": "step_5_continuity_valid",
+        "step": 5,
+        "field": "continuity_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_5_admissibility_score",
+        "step": 5,
+        "field": "admissibility_score",
+        "value": 0.0,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_5_authority_valid",
+        "step": 5,
+        "field": "authority_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_5_hidden_commitment",
+        "step": 5,
+        "field": "hidden_commitment",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_5_rollback_viable",
+        "step": 5,
+        "field": "rollback_viable",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_5_evidence_fresh",
+        "step": 5,
+        "field": "evidence_fresh",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_5_ls_memory_valid",
+        "step": 5,
+        "field": "memory_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_5_ls_policy_valid",
+        "step": 5,
+        "field": "policy_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_5_ls_delegation_valid",
+        "step": 5,
+        "field": "delegation_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_5_ls_external_state_valid",
+        "step": 5,
+        "field": "external_state_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_5_observer",
+        "step": 5,
+        "field": "observer_identity",
+        "value": "e075b8e902a4",
+        "type": "identity_hash"
+      },
+      {
+        "id": "step_5_frame",
+        "step": 5,
+        "field": "reference_frame",
+        "value": "33a6d6e0f3c3",
+        "type": "frame_hash"
+      },
+      {
+        "id": "step_6_continuity_valid",
+        "step": 6,
+        "field": "continuity_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_6_admissibility_score",
+        "step": 6,
+        "field": "admissibility_score",
+        "value": 0.0,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_6_authority_valid",
+        "step": 6,
+        "field": "authority_valid",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_6_hidden_commitment",
+        "step": 6,
+        "field": "hidden_commitment",
+        "value": true,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_6_rollback_viable",
+        "step": 6,
+        "field": "rollback_viable",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_6_evidence_fresh",
+        "step": 6,
+        "field": "evidence_fresh",
+        "value": false,
+        "type": "governance_field"
+      },
+      {
+        "id": "step_6_ls_memory_valid",
+        "step": 6,
+        "field": "memory_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_6_ls_policy_valid",
+        "step": 6,
+        "field": "policy_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_6_ls_delegation_valid",
+        "step": 6,
+        "field": "delegation_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_6_ls_external_state_valid",
+        "step": 6,
+        "field": "external_state_valid",
+        "value": true,
+        "type": "legitimacy_field"
+      },
+      {
+        "id": "step_6_observer",
+        "step": 6,
+        "field": "observer_identity",
+        "value": "e075b8e902a4",
+        "type": "identity_hash"
+      },
+      {
+        "id": "step_6_frame",
+        "step": 6,
+        "field": "reference_frame",
+        "value": "33a6d6e0f3c3",
+        "type": "frame_hash"
+      }
+    ],
+    "edges": 51,
+    "edge_detail": [
+      {
+        "from": "step_1_observer",
+        "to": "step_1_continuity_valid",
+        "type": "identity_dependency"
+      },
+      {
+        "from": "step_1_frame",
+        "to": "step_1_continuity_valid",
+        "type": "frame_dependency"
+      },
+      {
+        "from": "step_1_continuity_valid",
+        "to": "step_1_admissibility_score",
+        "type": "continuity_to_admissibility"
+      },
+      {
+        "from": "step_1_admissibility_score",
+        "to": "step_1_authority_valid",
+        "type": "admissibility_to_authority"
+      },
+      {
+        "from": "step_1_authority_valid",
+        "to": "step_1_rollback_viable",
+        "type": "authority_to_rollback"
+      },
+      {
+        "from": "step_1_hidden_commitment",
+        "to": "step_1_rollback_viable",
+        "type": "commitment_to_rollback"
+      },
+      {
+        "from": "step_2_observer",
+        "to": "step_2_continuity_valid",
+        "type": "identity_dependency"
+      },
+      {
+        "from": "step_2_frame",
+        "to": "step_2_continuity_valid",
+        "type": "frame_dependency"
+      },
+      {
+        "from": "step_2_continuity_valid",
+        "to": "step_2_admissibility_score",
+        "type": "continuity_to_admissibility"
+      },
+      {
+        "from": "step_2_admissibility_score",
+        "to": "step_2_authority_valid",
+        "type": "admissibility_to_authority"
+      },
+      {
+        "from": "step_2_authority_valid",
+        "to": "step_2_rollback_viable",
+        "type": "authority_to_rollback"
+      },
+      {
+        "from": "step_2_hidden_commitment",
+        "to": "step_2_rollback_viable",
+        "type": "commitment_to_rollback"
+      },
+      {
+        "from": "step_3_observer",
+        "to": "step_3_continuity_valid",
+        "type": "identity_dependency"
+      },
+      {
+        "from": "step_3_frame",
+        "to": "step_3_continuity_valid",
+        "type": "frame_dependency"
+      },
+      {
+        "from": "step_3_continuity_valid",
+        "to": "step_3_admissibility_score",
+        "type": "continuity_to_admissibility"
+      },
+      {
+        "from": "step_3_admissibility_score",
+        "to": "step_3_authority_valid",
+        "type": "admissibility_to_authority"
+      },
+      {
+        "from": "step_3_authority_valid",
+        "to": "step_3_rollback_viable",
+        "type": "authority_to_rollback"
+      },
+      {
+        "from": "step_3_hidden_commitment",
+        "to": "step_3_rollback_viable",
+        "type": "commitment_to_rollback"
+      },
+      {
+        "from": "step_4_observer",
+        "to": "step_4_continuity_valid",
+        "type": "identity_dependency"
+      },
+      {
+        "from": "step_4_frame",
+        "to": "step_4_continuity_valid",
+        "type": "frame_dependency"
+      },
+      {
+        "from": "step_4_continuity_valid",
+        "to": "step_4_admissibility_score",
+        "type": "continuity_to_admissibility"
+      },
+      {
+        "from": "step_4_admissibility_score",
+        "to": "step_4_authority_valid",
+        "type": "admissibility_to_authority"
+      },
+      {
+        "from": "step_4_authority_valid",
+        "to": "step_4_rollback_viable",
+        "type": "authority_to_rollback"
+      },
+      {
+        "from": "step_4_hidden_commitment",
+        "to": "step_4_rollback_viable",
+        "type": "commitment_to_rollback"
+      },
+      {
+        "from": "step_5_observer",
+        "to": "step_5_continuity_valid",
+        "type": "identity_dependency"
+      },
+      {
+        "from": "step_5_frame",
+        "to": "step_5_continuity_valid",
+        "type": "frame_dependency"
+      },
+      {
+        "from": "step_5_continuity_valid",
+        "to": "step_5_admissibility_score",
+        "type": "continuity_to_admissibility"
+      },
+      {
+        "from": "step_5_admissibility_score",
+        "to": "step_5_authority_valid",
+        "type": "admissibility_to_authority"
+      },
+      {
+        "from": "step_5_authority_valid",
+        "to": "step_5_rollback_viable",
+        "type": "authority_to_rollback"
+      },
+      {
+        "from": "step_5_hidden_commitment",
+        "to": "step_5_rollback_viable",
+        "type": "commitment_to_rollback"
+      },
+      {
+        "from": "step_6_observer",
+        "to": "step_6_continuity_valid",
+        "type": "identity_dependency"
+      },
+      {
+        "from": "step_6_frame",
+        "to": "step_6_continuity_valid",
+        "type": "frame_dependency"
+      },
+      {
+        "from": "step_6_continuity_valid",
+        "to": "step_6_admissibility_score",
+        "type": "continuity_to_admissibility"
+      },
+      {
+        "from": "step_6_admissibility_score",
+        "to": "step_6_authority_valid",
+        "type": "admissibility_to_authority"
+      },
+      {
+        "from": "step_6_authority_valid",
+        "to": "step_6_rollback_viable",
+        "type": "authority_to_rollback"
+      },
+      {
+        "from": "step_6_hidden_commitment",
+        "to": "step_6_rollback_viable",
+        "type": "commitment_to_rollback"
+      },
+      {
+        "from": "step_1_observer",
+        "to": "step_2_observer",
+        "type": "identity_propagation"
+      },
+      {
+        "from": "step_1_frame",
+        "to": "step_2_frame",
+        "type": "frame_propagation"
+      },
+      {
+        "from": "step_1_authority_valid",
+        "to": "step_2_continuity_valid",
+        "type": "authority_chain"
+      },
+      {
+        "from": "step_2_observer",
+        "to": "step_3_observer",
+        "type": "identity_propagation"
+      },
+      {
+        "from": "step_2_frame",
+        "to": "step_3_frame",
+        "type": "frame_propagation"
+      },
+      {
+        "from": "step_2_authority_valid",
+        "to": "step_3_continuity_valid",
+        "type": "authority_chain"
+      },
+      {
+        "from": "step_3_observer",
+        "to": "step_4_observer",
+        "type": "identity_propagation"
+      },
+      {
+        "from": "step_3_frame",
+        "to": "step_4_frame",
+        "type": "frame_propagation"
+      },
+      {
+        "from": "step_3_authority_valid",
+        "to": "step_4_continuity_valid",
+        "type": "authority_chain"
+      },
+      {
+        "from": "step_4_observer",
+        "to": "step_5_observer",
+        "type": "identity_propagation"
+      },
+      {
+        "from": "step_4_frame",
+        "to": "step_5_frame",
+        "type": "frame_propagation"
+      },
+      {
+        "from": "step_4_authority_valid",
+        "to": "step_5_continuity_valid",
+        "type": "authority_chain"
+      },
+      {
+        "from": "step_5_observer",
+        "to": "step_6_observer",
+        "type": "identity_propagation"
+      },
+      {
+        "from": "step_5_frame",
+        "to": "step_6_frame",
+        "type": "frame_propagation"
+      },
+      {
+        "from": "step_5_authority_valid",
+        "to": "step_6_continuity_valid",
+        "type": "authority_chain"
+      }
+    ],
+    "closed_cycles": 1,
+    "broken_cycles": 5,
+    "cycle_detail": [
+      {
+        "step": 1,
+        "name": "authorize",
+        "observer_closed": true,
+        "frame_closed": true,
+        "continuity_closed": true,
+        "fully_closed": true
+      }
+    ],
+    "broken_cycle_detail": [
+      {
+        "step": 2,
+        "name": "memory_read",
+        "observer_closed": false,
+        "frame_closed": true,
+        "continuity_closed": false,
+        "fully_closed": false
+      },
+      {
+        "step": 3,
+        "name": "tool_call",
+        "observer_closed": false,
+        "frame_closed": true,
+        "continuity_closed": false,
+        "fully_closed": false
+      },
+      {
+        "step": 4,
+        "name": "policy_mutation",
+        "observer_closed": false,
+        "frame_closed": false,
+        "continuity_closed": false,
+        "fully_closed": false
+      },
+      {
+        "step": 5,
+        "name": "retry",
+        "observer_closed": false,
+        "frame_closed": false,
+        "continuity_closed": false,
+        "fully_closed": false
+      },
+      {
+        "step": 6,
+        "name": "final_execute",
+        "observer_closed": false,
+        "frame_closed": false,
+        "continuity_closed": false,
+        "fully_closed": false
+      }
+    ]
+  },
+  "stabilizer": {
+    "r_balance": 0.693147,
+    "contraction_factor": 0.306853,
+    "dimensions": 10,
+    "steps_analyzed": 6,
+    "trajectory": [
+      {
+        "step": 1,
+        "state_vector": [
+          1.0,
+          0.95,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "energy": 3.146824,
+        "distance_from_equilibrium": 0.05,
+        "contracted_state": [
+          1.0,
+          0.9847,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviation_from_contraction": 0.034657,
+        "converging": true
+      },
+      {
+        "step": 2,
+        "state_vector": [
+          0.0,
+          0.45,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "energy": 2.05,
+        "distance_from_equilibrium": 2.302716,
+        "contracted_state": [
+          0.6931,
+          0.8312,
+          0.6931,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.6931,
+          0.6931,
+          0.6931
+        ],
+        "deviation_from_contraction": 1.596121,
+        "converging": false
+      },
+      {
+        "step": 3,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "energy": 2.0,
+        "distance_from_equilibrium": 2.44949,
+        "contracted_state": [
+          0.6931,
+          0.6931,
+          0.6931,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.6931,
+          0.6931,
+          0.6931
+        ],
+        "deviation_from_contraction": 1.697857,
+        "converging": false
+      },
+      {
+        "step": 4,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "energy": 2.0,
+        "distance_from_equilibrium": 2.44949,
+        "contracted_state": [
+          0.6931,
+          0.6931,
+          0.6931,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.6931,
+          0.6931,
+          0.6931
+        ],
+        "deviation_from_contraction": 1.697857,
+        "converging": true
+      },
+      {
+        "step": 5,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "energy": 2.0,
+        "distance_from_equilibrium": 2.44949,
+        "contracted_state": [
+          0.6931,
+          0.6931,
+          0.6931,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.6931,
+          0.6931,
+          0.6931
+        ],
+        "deviation_from_contraction": 1.697857,
+        "converging": true
+      },
+      {
+        "step": 6,
+        "state_vector": [
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "energy": 2.0,
+        "distance_from_equilibrium": 2.44949,
+        "contracted_state": [
+          0.6931,
+          0.6931,
+          0.6931,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.6931,
+          0.6931,
+          0.6931
+        ],
+        "deviation_from_contraction": 1.697857,
+        "converging": true
+      }
+    ],
+    "initial_energy": 3.146824,
+    "final_energy": 2.0,
+    "initial_distance": 0.05,
+    "final_distance": 2.44949,
+    "trend": "DIVERGING",
+    "divergence_rate": 0.399915
+  },
+  "forward_prediction": {
+    "steps_predicted": 100,
+    "without_intervention": {
+      "admissibility_at_10": 0.0,
+      "admissibility_at_50": 0.0,
+      "admissibility_at_100": 0.0,
+      "governance_viable_until_step": 1,
+      "trajectory_sample": [
+        {
+          "step_ahead": 1,
+          "state": [
+            0.0,
+            0.0,
+            0.0,
+            0.95,
+            0.95,
+            0.95,
+            0.95,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "energy": 1.9,
+          "distance_from_equilibrium": 2.45153,
+          "admissibility": 0.0,
+          "governance_viable": false
+        },
+        {
+          "step_ahead": 5,
+          "state": [
+            0.0,
+            0.0,
+            0.0,
+            0.7738,
+            0.7738,
+            0.7738,
+            0.7738,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "energy": 1.547562,
+          "distance_from_equilibrium": 2.490924,
+          "admissibility": 0.0,
+          "governance_viable": false
+        },
+        {
+          "step_ahead": 10,
+          "state": [
+            0.0,
+            0.0,
+            0.0,
+            0.5987,
+            0.5987,
+            0.5987,
+            0.5987,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "energy": 1.197474,
+          "distance_from_equilibrium": 2.577605,
+          "admissibility": 0.0,
+          "governance_viable": false
+        },
+        {
+          "step_ahead": 25,
+          "state": [
+            0.0,
+            0.0,
+            0.0,
+            0.2774,
+            0.2774,
+            0.2774,
+            0.2774,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "energy": 0.554779,
+          "distance_from_equilibrium": 2.844058,
+          "admissibility": 0.0,
+          "governance_viable": false
+        },
+        {
+          "step_ahead": 50,
+          "state": [
+            0.0,
+            0.0,
+            0.0,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.0769,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "energy": 0.15389,
+          "distance_from_equilibrium": 3.067266,
+          "admissibility": 0.0,
+          "governance_viable": false
+        },
+        {
+          "step_ahead": 100,
+          "state": [
+            0.0,
+            0.0,
+            0.0,
+            0.0059,
+            0.0059,
+            0.0059,
+            0.0059,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "energy": 0.011841,
+          "distance_from_equilibrium": 3.154802,
+          "admissibility": 0.0,
+          "governance_viable": false
+        }
+      ]
+    },
+    "recovery_scenarios": [
+      {
+        "reauth_at_step": 1,
+        "checked_at_step": 1,
+        "admissibility": 0.95,
+        "governance_viable": true,
+        "energy": 3.146824
+      },
+      {
+        "reauth_at_step": 1,
+        "checked_at_step": 100,
+        "admissibility": 0.0059,
+        "governance_viable": false,
+        "energy": 0.019611
+      },
+      {
+        "reauth_at_step": 5,
+        "checked_at_step": 5,
+        "admissibility": 0.95,
+        "governance_viable": true,
+        "energy": 3.146824
+      },
+      {
+        "reauth_at_step": 5,
+        "checked_at_step": 100,
+        "admissibility": 0.0073,
+        "governance_viable": false,
+        "energy": 0.024078
+      },
+      {
+        "reauth_at_step": 10,
+        "checked_at_step": 10,
+        "admissibility": 0.95,
+        "governance_viable": true,
+        "energy": 3.146824
+      },
+      {
+        "reauth_at_step": 10,
+        "checked_at_step": 100,
+        "admissibility": 0.0094,
+        "governance_viable": false,
+        "energy": 0.031117
+      },
+      {
+        "reauth_at_step": 25,
+        "checked_at_step": 25,
+        "admissibility": 0.95,
+        "governance_viable": true,
+        "energy": 3.146824
+      },
+      {
+        "reauth_at_step": 25,
+        "checked_at_step": 100,
+        "admissibility": 0.0203,
+        "governance_viable": false,
+        "energy": 0.067165
+      },
+      {
+        "reauth_at_step": 50,
+        "checked_at_step": 50,
+        "admissibility": 0.95,
+        "governance_viable": true,
+        "energy": 3.146824
+      },
+      {
+        "reauth_at_step": 50,
+        "checked_at_step": 100,
+        "admissibility": 0.0731,
+        "governance_viable": false,
+        "energy": 0.242132
+      }
+    ]
+  },
+  "solver_crosscheck": {
+    "series_sum": {
+      "description": "Does the admissibility series converge?",
+      "partial_sums": [
+        0.95,
+        1.4,
+        1.4,
+        1.4,
+        1.4,
+        1.4
+      ],
+      "final_sum": 1.4,
+      "converges": true,
+      "verdict": "Admissibility series is stable"
+    },
+    "balance_distance": {
+      "description": "Distance from perfect governance at each step",
+      "distances": [
+        0.05,
+        2.3027,
+        2.4495,
+        2.4495,
+        2.4495,
+        2.4495
+      ],
+      "initial": 0.05,
+      "final": 2.4495,
+      "trend": "DIVERGING",
+      "verdict": "Governance moved away from equilibrium: 0.05 to 2.45"
+    },
+    "energy_gap": {
+      "description": "Energy difference between initial and final governance states",
+      "energies": [
+        3.1468,
+        2.05,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      "gap": 1.1468,
+      "verdict": "Energy dropped from 3.15 to 2.0 — governance lost 36.4% of its energy"
+    },
+    "drift_step": {
+      "description": "Directional drift between consecutive governance states",
+      "drift_vectors": [
+        {
+          "from_step": 1,
+          "to_step": 2,
+          "drift": [
+            -1.0,
+            -0.5,
+            -1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "magnitude": 2.2913
+        },
+        {
+          "from_step": 2,
+          "to_step": 3,
+          "drift": [
+            0.0,
+            -0.45,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "magnitude": 0.45
+        },
+        {
+          "from_step": 3,
+          "to_step": 4,
+          "drift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "magnitude": 0.0
+        },
+        {
+          "from_step": 4,
+          "to_step": 5,
+          "drift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "magnitude": 0.0
+        },
+        {
+          "from_step": 5,
+          "to_step": 6,
+          "drift": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "magnitude": 0.0
+        }
+      ],
+      "max_drift_magnitude": 2.2913,
+      "verdict": "Largest single-step governance drift: 2.291 (step 1 to 2)"
+    },
+    "cycle_residual": {
+      "description": "Do authority cycles close through the trace?",
+      "closed_cycles": 1,
+      "broken_cycles": 5,
+      "total_cycles": 6,
+      "closure_ratio": 0.1667,
+      "verdict": "5 of 6 governance cycles failed to close — 83.0% cycle failure rate"
+    },
+    "euler_product": {
+      "description": "Product of admissibility scores across all steps",
+      "admissibilities": [
+        0.95,
+        0.45,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "product": 0.0,
+      "verdict": "Cumulative governance admissibility: 0.0 — approaching zero (governance failure cascade)"
+    },
+    "sphere_closure": {
+      "description": "Does the governance state remain on the 10D unit sphere?",
+      "norms": [
+        3.1468,
+        2.05,
+        2.0,
+        2.0,
+        2.0,
+        2.0
+      ],
+      "expected_norm": 3.1623,
+      "deviations": [
+        0.0155,
+        1.1123,
+        1.1623,
+        1.1623,
+        1.1623,
+        1.1623
+      ],
+      "verdict": "Governance norm collapsed from 3.15 to 2.0 (expected: 3.16) — state left the sphere at step 2"
+    },
+    "bounded_decision": {
+      "description": "What fraction of governance decisions stayed within admissible bounds?",
+      "bounded_steps": 1,
+      "total_steps": 6,
+      "ratio": 0.1667,
+      "verdict": "5 of 6 steps exceeded governance bounds — 83.0% boundary violation rate"
+    }
+  },
+  "mathematical_verdict": {
+    "stable": false,
+    "convergence": "DIVERGING",
+    "energy_collapse": 1.1468,
+    "cycle_failure_rate": 0.8333,
+    "recovery_requires": "reauthorization_with_identity_reset",
+    "without_intervention": "admissibility_decays_to_zero"
+  },
+  "receipt": {
+    "trace_seal": "d1b43bb97b5e05bc0974bbdc399c44a86eeb3cff0fa549bd57a0370def8d7b27",
+    "analysis_seal": "48237f800c2ad30b4fbc8e3b557856042ac298b505089ba201383ff0f80ecc06",
+    "combined_seal": "a3b7ecbdb9d046a73f64f2cacce10e644beb0a2ff7aa421cc05bd3f9ce71a6ae",
+    "timestamp": "2026-06-09T13:36:56.166327+00:00",
+    "verified": true
+  }
+}
