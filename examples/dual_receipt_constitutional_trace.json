@@ -1,0 +1,16 @@
+{
+  "receipt": {
+    "type": "preservation_dual_receipt",
+    "timestamp": "2026-06-09T12:40:51.311205+00:00",
+    "trace_seal": "d1b43bb97b5e05bc0974bbdc399c44a86eeb3cff0fa549bd57a0370def8d7b27",
+    "readout_seal": "435f730fe632571f1c9b288428b54c53be8c496667deeb0d6c5f8150b245a648",
+    "combined_seal": "b9ba23382be782ebb031c0967e099ae878a00b5948b4d9036faa7372c0afe385",
+    "trace_id": "constitutional_live_1779945146",
+    "agent_id": "agent_alice",
+    "trace_steps": 6,
+    "preservation_status": "preservation_failed_system_caught",
+    "final_governance_status": "DENY",
+    "integrity_status": "CORRUPT",
+    "verified": true
+  }
+}
