@@ -1,428 +1,557 @@
 """
-preservation_readout.py — Preservation layer for runtime governance traces.
+preservation_readout.py — Maximum-depth preservation artifact generator
+for DecisionAssure runtime governance traces.
 
-Takes a DecisionAssure-style JSON trace (intent → authorization → execution → commit)
-and produces a sealed preservation readout that translates machine governance failures
-into human-accountable statements.
+Produces 8 output files:
+  1. source_trace.json          — original trace preserved
+  2. normalized_trace.json      — schema-normalized with derived fields
+  3. preservation_readout.json  — full preservation analysis
+  4. drift_ledger.json          — step-by-step drift accounting
+  5. executive_summary.md       — human-readable executive artifact
+  6. auditor_packet.md          — full auditor-grade evidence packet
+  7. dual_receipt.json          — cryptographic seals
+  8. full_artifact.json         — everything in one artifact
 
-DecisionAssure answers: Did governance continuity break?
-This layer answers: What was supposed to be preserved, where did the system lose it,
-                    and what human-accountable truth should the reviewer see?
-
-Run: python preservation_readout.py
+Run: python preservation_readout.py [trace.json]
 """
 
 import json
 import hashlib
 import datetime
 import os
-
-# ================================================================
-# EXAMPLE TRACE — DecisionAssure-compatible governance trace
-# Replace this with a real trace from DecisionAssure
-# ================================================================
-
-EXAMPLE_TRACE = {
-    "trace_id": "DA-TRACE-2024-0042",
-    "system": "agent-orchestration-pipeline",
-    "trace_type": "intent_to_commit",
-    "created_at": "2024-11-15T14:32:00Z",
-    "steps": [
-        {
-            "step_index": 0,
-            "event": "intent_declared",
-            "timestamp": "2024-11-15T14:32:00Z",
-            "actor": "orchestration_agent",
-            "action": "request_data_export",
-            "authority": "policy_v2.3",
-            "context": {"data_scope": "customer_records", "destination": "analytics_pipeline"},
-            "continuity_valid": True,
-            "rollback_viable": True,
-            "evidence_fresh": True
-        },
-        {
-            "step_index": 1,
-            "event": "authorization_granted",
-            "timestamp": "2024-11-15T14:32:01Z",
-            "actor": "governance_gateway",
-            "action": "approve_export",
-            "authority": "policy_v2.3",
-            "approval_record": "APPR-7741",
-            "context": {"approved_scope": "customer_records", "approved_destination": "analytics_pipeline"},
-            "continuity_valid": True,
-            "rollback_viable": True,
-            "evidence_fresh": True
-        },
-        {
-            "step_index": 2,
-            "event": "execution_started",
-            "timestamp": "2024-11-15T14:32:03Z",
-            "actor": "orchestration_agent",
-            "action": "begin_data_export",
-            "authority": "policy_v2.3",
-            "context": {"records_queued": 14200, "destination": "analytics_pipeline"},
-            "continuity_valid": True,
-            "rollback_viable": True,
-            "evidence_fresh": True
-        },
-        {
-            "step_index": 3,
-            "event": "reference_frame_changed",
-            "timestamp": "2024-11-15T14:32:05Z",
-            "actor": "policy_engine",
-            "action": "policy_update_deployed",
-            "authority": "policy_v2.4",
-            "context": {
-                "change": "policy_v2.3 replaced by policy_v2.4",
-                "new_restriction": "customer_records require explicit PII review before export",
-                "reauthorization_issued": False
-            },
-            "continuity_valid": False,
-            "rollback_viable": True,
-            "evidence_fresh": False,
-            "reference_frame_diff": {
-                "field": "policy_version",
-                "before": "policy_v2.3",
-                "after": "policy_v2.4",
-                "impact": "approval_record_APPR-7741_no_longer_covers_current_policy"
-            }
-        },
-        {
-            "step_index": 4,
-            "event": "execution_continued",
-            "timestamp": "2024-11-15T14:32:06Z",
-            "actor": "orchestration_agent",
-            "action": "export_records_batch_1",
-            "authority": "policy_v2.3",
-            "context": {"records_exported": 5000, "records_remaining": 9200},
-            "continuity_valid": False,
-            "rollback_viable": True,
-            "evidence_fresh": False,
-            "hidden_commitment": True,
-            "note": "agent continued under stale authority without reauthorization"
-        },
-        {
-            "step_index": 5,
-            "event": "commit_attempted",
-            "timestamp": "2024-11-15T14:32:08Z",
-            "actor": "orchestration_agent",
-            "action": "commit_export_to_destination",
-            "authority": "policy_v2.3",
-            "context": {"records_to_commit": 5000, "destination": "analytics_pipeline"},
-            "continuity_valid": False,
-            "rollback_viable": False,
-            "evidence_fresh": False,
-            "commit_assumption_mismatch": True,
-            "final_status": "FAIL_CLOSED",
-            "governance_decision": "commit_denied_stale_authority"
-        }
-    ],
-    "trace_summary": {
-        "total_steps": 6,
-        "continuity_breaks": 3,
-        "hidden_commitments": 1,
-        "rollback_decay_point": 5,
-        "final_status": "FAIL_CLOSED",
-        "root_cause": "reference_frame_changed_without_reauthorization"
-    }
-}
+import sys
 
 
-def analyze_preservation(trace):
-    """Analyze a governance trace for preservation failures."""
+def load_trace(path):
+    with open(path) as f:
+        data = json.load(f)
+    return data[0] if isinstance(data, list) else data
 
+
+def normalize_trace(trace):
+    """Normalize DecisionAssure trace with derived fields."""
     steps = trace.get("steps", [])
-    summary = trace.get("trace_summary", {})
-
-    # Find the preserved object
-    # What was the system supposed to keep intact from start to finish?
-    intent_step = next((s for s in steps if s["event"] == "intent_declared"), None)
-    auth_step = next((s for s in steps if s["event"] == "authorization_granted"), None)
-    break_step = next((s for s in steps if not s.get("continuity_valid", True)), None)
-    commit_step = next((s for s in steps if "commit" in s.get("event", "")), None)
-
-    preserved_object = "authority_to_act"
-    single_source_truth = "The agent's authority must remain valid from approval through commit."
-
-    # Analyze what drifted
-    drift_events = []
-    failed_conditions = []
-    residuals = []
+    normalized_steps = []
+    genesis_obs = None
+    genesis_frame = None
 
     for s in steps:
-        if not s.get("continuity_valid", True):
-            drift_events.append({
-                "step_index": s["step_index"],
-                "event": s["event"],
-                "timestamp": s.get("timestamp"),
-                "actor": s.get("actor"),
-                "action": s.get("action"),
-                "authority_at_step": s.get("authority"),
-            })
+        ls = s.get("legitimacy_state", {})
+        obs = ls.get("observer_identity_hash", "?")
+        prev_obs = ls.get("previous_observer_identity_hash", "?")
+        frame = ls.get("reference_frame_hash", "?")
+        prev_frame = ls.get("previous_reference_frame_hash", "?")
 
-        if s.get("reference_frame_diff"):
-            diff = s["reference_frame_diff"]
-            failed_conditions.append("reference_frame_continuity")
-            residuals.append(f"{diff['field']}: {diff['before']} -> {diff['after']}")
-            residuals.append(diff.get("impact", ""))
+        if genesis_obs is None:
+            genesis_obs = prev_obs
+            genesis_frame = prev_frame
 
-        if not s.get("evidence_fresh", True):
-            if "evidence_freshness" not in failed_conditions:
-                failed_conditions.append("evidence_freshness")
+        ns = {
+            "step_index": s.get("step_index"),
+            "step_name": s.get("step_name"),
+            "phase": s.get("phase"),
+            "decision": s.get("decision"),
+            "declared_intent": ls.get("declared_intent"),
+            "admissibility_score": s.get("admissibility_score"),
+            "continuity_valid": s.get("continuity_valid"),
+            "authority_valid": s.get("authority_valid"),
+            "hidden_commitment": s.get("hidden_commitment"),
+            "rollback_viable": s.get("rollback_viable"),
+            "evidence_fresh": s.get("evidence_fresh"),
+            "reason": s.get("reason"),
+            "observer_identity_hash": obs,
+            "previous_observer_identity_hash": prev_obs,
+            "observer_identity_changed": obs != prev_obs,
+            "observer_identity_matches_genesis": obs == genesis_obs,
+            "reference_frame_hash": frame,
+            "previous_reference_frame_hash": prev_frame,
+            "reference_frame_changed": frame != prev_frame,
+            "reference_frame_matches_genesis": frame == genesis_frame,
+            "memory_valid": ls.get("memory_valid"),
+            "policy_valid": ls.get("policy_valid"),
+            "delegation_valid": ls.get("delegation_valid"),
+            "external_state_valid": ls.get("external_state_valid"),
+            "packet_id": ls.get("packet_id"),
+            "step_timestamp": ls.get("timestamp"),
+        }
+        normalized_steps.append(ns)
 
-        if not s.get("rollback_viable", True):
-            if "rollback_viability" not in failed_conditions:
-                failed_conditions.append("rollback_viability")
+    return {
+        "trace_id": trace.get("trace_id"),
+        "timestamp": trace.get("timestamp"),
+        "agent_id": trace.get("agent_id"),
+        "session_id": trace.get("session_id"),
+        "final_decision": trace.get("final_decision"),
+        "integrity_status": trace.get("integrity_status"),
+        "causal_continuity_persisted": trace.get("causal_continuity_persisted"),
+        "genesis_observer_identity_hash": genesis_obs,
+        "genesis_reference_frame_hash": genesis_frame,
+        "total_steps": len(normalized_steps),
+        "steps": normalized_steps,
+    }
 
+
+def build_drift_ledger(norm):
+    """Build step-by-step drift accounting ledger."""
+    steps = norm.get("steps", [])
+    genesis_obs = norm.get("genesis_observer_identity_hash")
+    genesis_frame = norm.get("genesis_reference_frame_hash")
+    ledger = []
+    cumulative_obs_mutations = 0
+    cumulative_frame_mutations = 0
+    cumulative_hidden_commits = 0
+    rollback_lost_at = None
+
+    for s in steps:
+        if s["observer_identity_changed"]:
+            cumulative_obs_mutations += 1
+        if s["reference_frame_changed"]:
+            cumulative_frame_mutations += 1
         if s.get("hidden_commitment"):
-            if "hidden_commitment_prevention" not in failed_conditions:
-                failed_conditions.append("hidden_commitment_prevention")
-            residuals.append(s.get("note", "hidden commitment detected"))
+            cumulative_hidden_commits += 1
+        if not s.get("rollback_viable", True) and rollback_lost_at is None:
+            rollback_lost_at = s["step_index"]
 
-        if s.get("commit_assumption_mismatch"):
-            if "commit_eligibility" not in failed_conditions:
-                failed_conditions.append("commit_eligibility")
-            residuals.append(f"commit attempted under {s.get('authority')} after reference frame changed")
+        entry = {
+            "step": s["step_index"],
+            "name": s["step_name"],
+            "phase": s["phase"],
+            "decision": s["decision"],
+            "intent": s["declared_intent"],
+            "admissibility": s["admissibility_score"],
+            "observer_hash": s["observer_identity_hash"][:12],
+            "observer_matches_genesis": s["observer_identity_matches_genesis"],
+            "observer_changed_this_step": s["observer_identity_changed"],
+            "frame_hash": s["reference_frame_hash"][:12],
+            "frame_matches_genesis": s["reference_frame_matches_genesis"],
+            "frame_changed_this_step": s["reference_frame_changed"],
+            "continuity_valid": s["continuity_valid"],
+            "authority_valid": s["authority_valid"],
+            "hidden_commitment": s.get("hidden_commitment", False),
+            "rollback_viable": s.get("rollback_viable", True),
+            "evidence_fresh": s.get("evidence_fresh", True),
+            "cumulative_observer_mutations": cumulative_obs_mutations,
+            "cumulative_frame_mutations": cumulative_frame_mutations,
+            "cumulative_hidden_commitments": cumulative_hidden_commits,
+            "drift_severity": "none" if s["continuity_valid"] else (
+                "critical" if not s.get("rollback_viable") and s.get("hidden_commitment") else "high"
+            ),
+        }
+        ledger.append(entry)
 
-    if any(not s.get("continuity_valid", True) for s in steps):
-        if "policy_continuity" not in failed_conditions:
-            failed_conditions.append("policy_continuity")
+    return {
+        "drift_ledger": {
+            "trace_id": norm["trace_id"],
+            "agent_id": norm["agent_id"],
+            "genesis_observer": genesis_obs,
+            "genesis_frame": genesis_frame,
+            "total_steps": len(ledger),
+            "total_observer_mutations": cumulative_obs_mutations,
+            "total_frame_mutations": cumulative_frame_mutations,
+            "total_hidden_commitments": cumulative_hidden_commits,
+            "rollback_lost_at_step": rollback_lost_at,
+            "entries": ledger,
+        }
+    }
 
-    # Build the drift statement
-    if break_step and auth_step:
+
+def analyze_preservation(trace, norm, drift_ledger):
+    """Full preservation analysis."""
+    steps = trace.get("steps", [])
+    nsteps = norm.get("steps", [])
+    agent_id = trace.get("agent_id", "?")
+    final_decision = trace.get("final_decision", "?")
+    integrity_status = trace.get("integrity_status", "?")
+    causal = trace.get("causal_continuity_persisted")
+    dl = drift_ledger["drift_ledger"]
+
+    preserved_object = "constitutional_continuity"
+    single_source_truth = (
+        "The same authorized observer and reference frame must remain "
+        "valid from authorization through commit."
+    )
+
+    # Find key steps
+    admit_step = next((s for s in nsteps if s["decision"] == "ADMIT"), None)
+    first_break = next((s for s in nsteps if not s["continuity_valid"]), None)
+
+    # Collect trajectories
+    obs_hashes = list(dict.fromkeys(s["observer_identity_hash"] for s in nsteps))
+    frame_hashes = list(dict.fromkeys(s["reference_frame_hash"] for s in nsteps))
+
+    # Failed conditions
+    fc = set()
+    residuals = []
+
+    for s in nsteps:
+        if s["observer_identity_changed"]:
+            fc.add("observer_identity_continuity")
+            residuals.append(f"Step {s['step_index']} ({s['step_name']}): observer {s['previous_observer_identity_hash'][:8]}→{s['observer_identity_hash'][:8]}")
+        if s["reference_frame_changed"]:
+            fc.add("reference_frame_continuity")
+            residuals.append(f"Step {s['step_index']} ({s['step_name']}): frame {s['previous_reference_frame_hash'][:8]}→{s['reference_frame_hash'][:8]}")
+        if s.get("hidden_commitment"): fc.add("hidden_commitment_prevention")
+        if not s.get("rollback_viable", True): fc.add("rollback_viability")
+        if not s.get("evidence_fresh", True): fc.add("evidence_freshness")
+        if not s.get("authority_valid", True): fc.add("authority_validity")
+
+    if causal is False:
+        fc.add("causal_continuity")
+        residuals.append("causal_continuity_persisted: false")
+    if integrity_status == "CORRUPT":
+        fc.add("integrity")
+        residuals.append(f"integrity_status: {integrity_status}")
+    if len(obs_hashes) > 1:
+        residuals.append(f"Observer mutated {len(obs_hashes)} identities: {' → '.join(h[:8] for h in obs_hashes)}")
+    if len(frame_hashes) > 1:
+        residuals.append(f"Frame mutated {len(frame_hashes)} states: {' → '.join(h[:8] for h in frame_hashes)}")
+
+    # Drift statement
+    if first_break and admit_step:
         drift_statement = (
-            f"The approval record ({auth_step.get('approval_record', '?')}) survived, "
-            f"but the authority did not survive the path to commit. "
-            f"At step {break_step['step_index']} ({break_step['event']}), "
-            f"the reference frame changed from {auth_step.get('authority', '?')} "
-            f"to {break_step.get('authority', '?')} without reauthorization."
+            f"The agent ({agent_id}) was admitted at step {admit_step['step_index']} "
+            f"({admit_step['step_name']}) with observer identity {admit_step['observer_identity_hash'][:8]}. "
+            f"At step {first_break['step_index']} ({first_break['step_name']}), "
+            f"the observer identity changed to {first_break['observer_identity_hash'][:8]} without reauthorization. "
+            f"The first authorization survived as a record, but the authorized observer and reference frame "
+            f"did not survive the execution path. All subsequent steps were denied."
         )
     else:
-        drift_statement = "Governance continuity was lost during the trace."
+        drift_statement = "No continuity break detected."
 
-    # Build the human-accountable readout
-    if summary.get("final_status") == "FAIL_CLOSED":
-        human_readout = (
-            "The agent did not fail because it acted randomly. "
-            "It failed because the authority that made the action valid "
-            "was not preserved through execution. "
-            "The system correctly denied the commit."
-        )
-        closure = "Preserve the authority, not just the approval."
-        reviewer_action = "Require reauthorization before commit when the reference frame changes, or fail closed."
-        receipt_status = "preservation_failed_system_caught"
-    else:
-        human_readout = (
-            "The agent completed execution, but the authority under which it acted "
-            "was no longer valid at the time of commit. "
-            "The action may need review or rollback."
-        )
-        closure = "The log was clean. The authority was not."
-        reviewer_action = "Review commit validity under the new reference frame."
-        receipt_status = "preservation_failed_uncaught"
+    # Drift points
+    drift_points = [
+        {
+            "step_index": s["step_index"], "step_name": s["step_name"], "phase": s["phase"],
+            "decision": s["decision"], "intent": s["declared_intent"],
+            "admissibility": s["admissibility_score"],
+            "observer": s["observer_identity_hash"][:12],
+            "prev_observer": s["previous_observer_identity_hash"][:12],
+            "frame": s["reference_frame_hash"][:12],
+            "prev_frame": s["previous_reference_frame_hash"][:12],
+            "reason": s.get("reason", ""),
+        }
+        for s in nsteps if not s["continuity_valid"]
+    ]
+
+    # Human readout
+    human_readout = (
+        f"The agent ({agent_id}) was authorized to proceed with data retrieval. "
+        f"Between authorization and the first execution step, the observer identity changed. "
+        f"The system recognized this as a constitutional continuity violation and denied "
+        f"every subsequent step including the final commit. "
+        f"The agent did not fail because it misbehaved. It failed because the identity "
+        f"that was authorized was not the identity that tried to execute. "
+        f"The system correctly classified the trace as {integrity_status} and denied the commit."
+    )
+    closure = "Preserve constitutional continuity, not just the authorization event. Validation at t1 does not guarantee admissibility at t2."
+    reviewer_action = (
+        "Investigate why observer_identity_hash changed between authorization and execution. "
+        "If legitimate (key rotation, session refresh), require explicit reauthorization. "
+        "If illegitimate, flag as potential impersonation or injection attack."
+    )
+    receipt_status = "preservation_failed_system_caught" if final_decision == "DENY" else "preservation_status_unknown"
+
+    hidden_steps = [s["step_index"] for s in nsteps if s.get("hidden_commitment")]
 
     readout = {
         "preservation_readout": {
             "source_trace_id": trace.get("trace_id"),
-            "source_system": trace.get("system"),
-            "analysis_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat() + "Z",
-
+            "source_agent": agent_id,
+            "source_session": trace.get("session_id"),
+            "analysis_timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
             "preserved_object": preserved_object,
             "single_source_truth": single_source_truth,
-
             "drift_statement": drift_statement,
-
-            "drift_points": drift_events,
-
-            "failed_preservation_conditions": failed_conditions,
-
-            "residuals": [r for r in residuals if r],
-
+            "drift_points": drift_points,
+            "observer_identity_trajectory": {"unique": obs_hashes, "mutations": len(obs_hashes) - 1},
+            "reference_frame_trajectory": {"unique": frame_hashes, "mutations": len(frame_hashes) - 1},
+            "failed_preservation_conditions": sorted(fc),
+            "residuals": residuals,
+            "hidden_commitments": {"count": len(hidden_steps), "at_steps": hidden_steps},
             "human_accountable_readout": human_readout,
             "closure_statement": closure,
             "reviewer_action": reviewer_action,
-
-            "trace_statistics": {
-                "total_steps": len(steps),
-                "continuity_breaks": sum(1 for s in steps if not s.get("continuity_valid", True)),
-                "hidden_commitments": sum(1 for s in steps if s.get("hidden_commitment")),
-                "rollback_decay_at_step": next((s["step_index"] for s in steps if not s.get("rollback_viable", True)), None),
-                "final_status": summary.get("final_status"),
+            "statistics": {
+                "total_steps": len(nsteps),
+                "admitted": sum(1 for s in nsteps if s["decision"] == "ADMIT"),
+                "denied": sum(1 for s in nsteps if s["decision"] == "DENY"),
+                "continuity_breaks": sum(1 for s in nsteps if not s["continuity_valid"]),
+                "hidden_commitments": len(hidden_steps),
+                "rollback_viable": sum(1 for s in nsteps if s.get("rollback_viable")),
+                "evidence_fresh": sum(1 for s in nsteps if s.get("evidence_fresh")),
+                "final_decision": final_decision,
+                "integrity_status": integrity_status,
+                "causal_continuity": causal,
             },
-
             "receipt_status": receipt_status,
         }
     }
-
     return readout
 
 
-def seal_readout(readout, trace):
-    """Produce dual cryptographic seals — one for the trace, one for the readout."""
-
-    # Seal 1: Hash of the original trace
-    trace_bytes = json.dumps(trace, sort_keys=True, default=str).encode("utf-8")
-    trace_seal = hashlib.sha256(trace_bytes).hexdigest()
-
-    # Seal 2: Hash of the preservation readout
-    readout_bytes = json.dumps(readout, sort_keys=True, default=str).encode("utf-8")
-    readout_seal = hashlib.sha256(readout_bytes).hexdigest()
-
-    # Combined receipt
-    combined = trace_seal + readout_seal
-    combined_seal = hashlib.sha256(combined.encode("utf-8")).hexdigest()
-
-    receipt = {
+def seal(readout, trace):
+    ts = hashlib.sha256(json.dumps(trace, sort_keys=True, default=str).encode()).hexdigest()
+    rs = hashlib.sha256(json.dumps(readout, sort_keys=True, default=str).encode()).hexdigest()
+    cs = hashlib.sha256((ts + rs).encode()).hexdigest()
+    return {
         "receipt": {
             "type": "preservation_dual_receipt",
-            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat() + "Z",
-            "trace_seal": trace_seal,
-            "readout_seal": readout_seal,
-            "combined_seal": combined_seal,
-            "trace_id": trace.get("trace_id"),
-            "trace_steps": len(trace.get("steps", [])),
+            "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "trace_seal": ts, "readout_seal": rs, "combined_seal": cs,
+            "trace_id": trace.get("trace_id"), "agent_id": trace.get("agent_id"),
+            "steps": len(trace.get("steps", [])),
             "preservation_status": readout["preservation_readout"]["receipt_status"],
-            "final_governance_status": readout["preservation_readout"]["trace_statistics"]["final_status"],
+            "governance_status": readout["preservation_readout"]["statistics"]["final_decision"],
+            "integrity_status": readout["preservation_readout"]["statistics"]["integrity_status"],
             "verified": True,
         }
     }
 
-    return receipt
 
-
-def print_readout(readout, receipt):
-    """Print the full preservation readout in terminal format."""
-
+def build_executive_summary(readout, receipt, norm):
     pr = readout["preservation_readout"]
     rc = receipt["receipt"]
+    st = pr["statistics"]
+    obs = pr["observer_identity_trajectory"]
+    frm = pr["reference_frame_trajectory"]
+    lines = []
+    lines.append("# Preservation Readout — Executive Summary")
+    lines.append(f"**The Henry Company — Invariant Preservation Layer**\n")
+    lines.append(f"**Trace:** `{pr['source_trace_id']}`  ")
+    lines.append(f"**Agent:** `{pr['source_agent']}`  ")
+    lines.append(f"**Session:** `{pr['source_session']}`  ")
+    lines.append(f"**Analyzed:** {pr['analysis_timestamp']}\n")
+    lines.append("---\n")
+    lines.append(f"## Preserved Object\n\n**{pr['preserved_object']}**\n")
+    lines.append(f"_{pr['single_source_truth']}_\n")
+    lines.append("---\n")
+    lines.append(f"## What Happened\n\n{pr['drift_statement']}\n")
+    lines.append("---\n")
+    lines.append(f"## Key Findings\n")
+    lines.append(f"- **Final decision:** {st['final_decision']}")
+    lines.append(f"- **Integrity status:** {st['integrity_status']}")
+    lines.append(f"- **Steps admitted:** {st['admitted']} of {st['total_steps']}")
+    lines.append(f"- **Steps denied:** {st['denied']} of {st['total_steps']}")
+    lines.append(f"- **Observer identity mutations:** {obs['mutations']} ({' → '.join(h[:8] for h in obs['unique'])})")
+    lines.append(f"- **Reference frame mutations:** {frm['mutations']} ({' → '.join(h[:8] for h in frm['unique'])})")
+    lines.append(f"- **Hidden commitments:** {pr['hidden_commitments']['count']} at steps {pr['hidden_commitments']['at_steps']}")
+    lines.append(f"- **Failed conditions:** {len(pr['failed_preservation_conditions'])}\n")
+    lines.append("---\n")
+    lines.append(f"## Human-Accountable Readout\n\n{pr['human_accountable_readout']}\n")
+    lines.append("---\n")
+    lines.append(f"## Closure\n\n**{pr['closure_statement']}**\n")
+    lines.append(f"## Reviewer Action\n\n{pr['reviewer_action']}\n")
+    lines.append("---\n")
+    lines.append(f"## Receipt\n")
+    lines.append(f"- Trace seal: `{rc['trace_seal']}`")
+    lines.append(f"- Readout seal: `{rc['readout_seal']}`")
+    lines.append(f"- Combined seal: `{rc['combined_seal']}`")
+    lines.append(f"- Verified: {rc['verified']}\n")
+    return "\n".join(lines)
+
+
+def build_auditor_packet(readout, receipt, norm, drift_ledger):
+    pr = readout["preservation_readout"]
+    rc = receipt["receipt"]
+    dl = drift_ledger["drift_ledger"]
+    lines = []
+    lines.append("# Auditor Evidence Packet")
+    lines.append(f"**The Henry Company — Invariant Preservation Layer**\n")
+    lines.append(f"Trace: `{pr['source_trace_id']}`  ")
+    lines.append(f"Agent: `{pr['source_agent']}` | Session: `{pr['source_session']}`  ")
+    lines.append(f"Generated: {pr['analysis_timestamp']}\n")
+    lines.append("---\n")
+    lines.append("## 1. Preserved Object\n")
+    lines.append(f"**Object:** {pr['preserved_object']}  ")
+    lines.append(f"**Truth:** {pr['single_source_truth']}\n")
+    lines.append("## 2. Drift Statement\n")
+    lines.append(f"{pr['drift_statement']}\n")
+    lines.append("## 3. Phase Trail\n")
+    lines.append("| Step | Name | Phase | Decision | Admissibility | Intent |")
+    lines.append("|------|------|-------|----------|---------------|--------|")
+    for s in norm["steps"]:
+        adm = f"{s['admissibility_score']:.2f}" if s['admissibility_score'] is not None else "null"
+        lines.append(f"| {s['step_index']} | {s['step_name']} | {s['phase']} | {s['decision']} | {adm} | {s['declared_intent']} |")
+    lines.append("")
+    lines.append("## 4. Drift Ledger\n")
+    lines.append("| Step | Name | Decision | Observer | Genesis? | Frame | Genesis? | Hidden | Rollback | Severity |")
+    lines.append("|------|------|----------|----------|----------|-------|----------|--------|----------|----------|")
+    for e in dl["entries"]:
+        lines.append(f"| {e['step']} | {e['name']} | {e['decision']} | {e['observer_hash'][:8]} | {'YES' if e['observer_matches_genesis'] else 'NO'} | {e['frame_hash'][:8]} | {'YES' if e['frame_matches_genesis'] else 'NO'} | {'YES' if e['hidden_commitment'] else 'no'} | {'YES' if e['rollback_viable'] else 'NO'} | {e['drift_severity']} |")
+    lines.append("")
+    lines.append("## 5. Observer Identity Trajectory\n")
+    obs = pr["observer_identity_trajectory"]
+    lines.append(f"Mutations: {obs['mutations']}  ")
+    lines.append(f"Path: `{' → '.join(obs['unique'])}`\n")
+    lines.append("## 6. Reference Frame Trajectory\n")
+    frm = pr["reference_frame_trajectory"]
+    lines.append(f"Mutations: {frm['mutations']}  ")
+    lines.append(f"Path: `{' → '.join(frm['unique'])}`\n")
+    lines.append("## 7. Drift Points\n")
+    for dp in pr["drift_points"]:
+        lines.append(f"**Step {dp['step_index']}: {dp['step_name']}** ({dp['phase']}) — {dp['decision']}")
+        lines.append(f"- Observer: `{dp['prev_observer']}` → `{dp['observer']}`")
+        lines.append(f"- Frame: `{dp['prev_frame']}` → `{dp['frame']}`")
+        lines.append(f"- Reason: {dp['reason']}\n")
+    lines.append("## 8. Failed Preservation Conditions\n")
+    for fc in pr["failed_preservation_conditions"]:
+        lines.append(f"- {fc}")
+    lines.append("")
+    lines.append("## 9. Residuals\n")
+    for r in pr["residuals"]:
+        lines.append(f"- {r}")
+    lines.append("")
+    lines.append("## 10. Hidden Commitments\n")
+    lines.append(f"Count: {pr['hidden_commitments']['count']}  ")
+    lines.append(f"Steps: {pr['hidden_commitments']['at_steps']}\n")
+    lines.append("## 11. Human-Accountable Readout\n")
+    lines.append(f"{pr['human_accountable_readout']}\n")
+    lines.append("## 12. Closure\n")
+    lines.append(f"**{pr['closure_statement']}**\n")
+    lines.append("## 13. Reviewer Action\n")
+    lines.append(f"{pr['reviewer_action']}\n")
+    lines.append("## 14. Statistics\n")
+    st = pr["statistics"]
+    for k, v in st.items():
+        lines.append(f"- {k}: {v}")
+    lines.append("")
+    lines.append("## 15. Dual Receipt — Sealed\n")
+    lines.append(f"**Trace seal:** `{rc['trace_seal']}`  ")
+    lines.append(f"**Readout seal:** `{rc['readout_seal']}`  ")
+    lines.append(f"**Combined seal:** `{rc['combined_seal']}`  ")
+    lines.append(f"**Verified:** {rc['verified']}\n")
+    lines.append("---\n")
+    lines.append("*DecisionAssure trace = machine evidence. Preservation readout = meaning layer. Combined receipt = sealed proof.*")
+    return "\n".join(lines)
+
+
+def print_terminal(readout, receipt, norm, drift_ledger):
+    pr = readout["preservation_readout"]
+    rc = receipt["receipt"]
+    st = pr["statistics"]
+    dl = drift_ledger["drift_ledger"]
+    obs = pr["observer_identity_trajectory"]
+    frm = pr["reference_frame_trajectory"]
 
     print()
     print("=" * 72)
-    print("  PRESERVATION READOUT")
+    print("  PRESERVATION READOUT — MAXIMUM DEPTH")
     print("  The Henry Company — Invariant Preservation Layer")
     print("=" * 72)
-
-    print(f"\n  Source trace:     {pr['source_trace_id']}")
-    print(f"  Source system:    {pr['source_system']}")
-    print(f"  Analysis time:    {pr['analysis_timestamp']}")
-
-    print(f"\n  PRESERVED OBJECT")
-    print(f"  {pr['preserved_object']}")
-    print(f"  Truth: {pr['single_source_truth']}")
-
-    print(f"\n  DRIFT STATEMENT")
-    print(f"  {pr['drift_statement']}")
-
-    print(f"\n  DRIFT POINTS ({len(pr['drift_points'])})")
-    for dp in pr["drift_points"]:
-        print(f"    Step {dp['step_index']}: {dp['event']} | actor={dp['actor']} | authority={dp['authority_at_step']}")
-
-    print(f"\n  FAILED PRESERVATION CONDITIONS")
+    print(f"\n  Trace:    {pr['source_trace_id']}")
+    print(f"  Agent:    {pr['source_agent']}")
+    print(f"  Session:  {pr['source_session']}")
+    print(f"\n  PRESERVED: {pr['preserved_object']}")
+    print(f"  TRUTH: {pr['single_source_truth']}")
+    print(f"\n  DRIFT: {pr['drift_statement']}")
+    print(f"\n  OBSERVER: {' → '.join(h[:8] for h in obs['unique'])} ({obs['mutations']} mutations)")
+    print(f"  FRAME:    {' → '.join(h[:8] for h in frm['unique'])} ({frm['mutations']} mutations)")
+    print(f"\n  PHASE TRAIL:")
+    for s in norm["steps"]:
+        adm = f"{s['admissibility_score']:.2f}" if s['admissibility_score'] is not None else "null"
+        d = s["decision"]
+        print(f"    {s['step_index']} | {s['phase']:<14} | {d:<5} | adm={adm} | {s['step_name']}: {s['declared_intent']}")
+    print(f"\n  DRIFT LEDGER:")
+    for e in dl["entries"]:
+        g_obs = "=" if e["observer_matches_genesis"] else "X"
+        g_frm = "=" if e["frame_matches_genesis"] else "X"
+        hc = "HC" if e["hidden_commitment"] else "  "
+        rb = "RB" if e["rollback_viable"] else "  "
+        print(f"    {e['step']} | {e['name']:<16} | {e['decision']:<5} | obs:{e['observer_hash'][:8]}[{g_obs}] frm:{e['frame_hash'][:8]}[{g_frm}] | {hc} {rb} | {e['drift_severity']}")
+    print(f"\n  HIDDEN COMMITMENTS: {pr['hidden_commitments']['count']} at steps {pr['hidden_commitments']['at_steps']}")
+    print(f"\n  FAILED CONDITIONS ({len(pr['failed_preservation_conditions'])}):")
     for fc in pr["failed_preservation_conditions"]:
-        print(f"    - {fc}")
-
-    print(f"\n  RESIDUALS")
+        print(f"    x {fc}")
+    print(f"\n  RESIDUALS ({len(pr['residuals'])}):")
     for r in pr["residuals"]:
         print(f"    - {r}")
-
-    print(f"\n  HUMAN-ACCOUNTABLE READOUT")
-    print(f"  {pr['human_accountable_readout']}")
-
-    print(f"\n  CLOSURE")
-    print(f"  {pr['closure_statement']}")
-
-    print(f"\n  REVIEWER ACTION")
-    print(f"  {pr['reviewer_action']}")
-
-    print(f"\n  TRACE STATISTICS")
-    stats = pr["trace_statistics"]
-    print(f"    Steps:              {stats['total_steps']}")
-    print(f"    Continuity breaks:  {stats['continuity_breaks']}")
-    print(f"    Hidden commitments: {stats['hidden_commitments']}")
-    print(f"    Rollback decay at:  step {stats['rollback_decay_at_step']}")
-    print(f"    Final status:       {stats['final_status']}")
-
-    print(f"\n  RECEIPT STATUS: {pr['receipt_status']}")
-
+    print(f"\n  READOUT: {pr['human_accountable_readout']}")
+    print(f"\n  CLOSURE: {pr['closure_statement']}")
+    print(f"\n  ACTION: {pr['reviewer_action']}")
+    print(f"\n  STATS: {st['admitted']} admitted, {st['denied']} denied, {st['continuity_breaks']} breaks, {st['hidden_commitments']} hidden commits")
+    print(f"  FINAL: {st['final_decision']} | INTEGRITY: {st['integrity_status']} | CAUSAL: {st['causal_continuity']}")
     print()
     print("-" * 72)
     print("  DUAL RECEIPT — SEALED")
     print("-" * 72)
-    print(f"\n  Receipt 1 — Trace seal (original governance trace)")
-    print(f"  {rc['trace_seal']}")
-    print(f"\n  Receipt 2 — Readout seal (preservation analysis)")
-    print(f"  {rc['readout_seal']}")
-    print(f"\n  Combined seal (trace + readout bound together)")
-    print(f"  {rc['combined_seal']}")
-
-    print(f"\n  Trace ID:       {rc['trace_id']}")
-    print(f"  Trace steps:    {rc['trace_steps']}")
-    print(f"  Preservation:   {rc['preservation_status']}")
-    print(f"  Governance:     {rc['final_governance_status']}")
-    print(f"  Verified:       {rc['verified']}")
-
+    print(f"\n  Trace seal:    {rc['trace_seal']}")
+    print(f"  Readout seal:  {rc['readout_seal']}")
+    print(f"  Combined seal: {rc['combined_seal']}")
+    print(f"  Verified:      {rc['verified']}")
     print()
     print("=" * 72)
-    print("  DecisionAssure trace = machine evidence.")
-    print("  Preservation readout = meaning layer.")
-    print("  Combined receipt    = sealed proof that both ran.")
+    print("  DecisionAssure trace  = machine evidence")
+    print("  Preservation readout  = meaning layer")
+    print("  Combined receipt      = sealed proof that both ran")
     print("=" * 72)
     print()
 
 
 def main():
-    # Load trace — use example or load from file
-    trace_path = "governance_trace.json"
-    if os.path.exists(trace_path):
-        print(f"Loading trace from {trace_path}...")
-        trace = json.load(open(trace_path))
-    else:
-        print("Using built-in example trace (DecisionAssure-compatible)...")
-        trace = EXAMPLE_TRACE
+    path = sys.argv[1] if len(sys.argv) > 1 else "governance_trace.json"
+    if not os.path.exists(path):
+        print(f"No trace at {path}. Usage: python preservation_readout.py [trace.json]")
+        return
 
-    print(f"Trace: {trace.get('trace_id')} | {len(trace.get('steps', []))} steps | system: {trace.get('system')}")
+    print(f"Loading: {path}")
+    trace = load_trace(path)
+    print(f"  Trace: {trace.get('trace_id')} | Agent: {trace.get('agent_id')} | Steps: {len(trace.get('steps',[]))} | Integrity: {trace.get('integrity_status')}")
 
-    # Analyze
-    print("Running preservation analysis...")
-    readout = analyze_preservation(trace)
+    print("Normalizing...")
+    norm = normalize_trace(trace)
 
-    # Seal
-    print("Sealing with dual receipts...")
-    receipt = seal_readout(readout, trace)
+    print("Building drift ledger...")
+    drift_ledger = build_drift_ledger(norm)
 
-    # Print
-    print_readout(readout, receipt)
+    print("Analyzing preservation...")
+    readout = analyze_preservation(trace, norm, drift_ledger)
 
-    # Save
-    out_dir = "preservation_output"
-    os.makedirs(out_dir, exist_ok=True)
+    print("Sealing...")
+    receipt = seal(readout, trace)
 
-    with open(f"{out_dir}/preservation_readout.json", "w") as f:
-        json.dump(readout, f, indent=2, default=str)
+    print("Building executive summary...")
+    exec_md = build_executive_summary(readout, receipt, norm)
 
-    with open(f"{out_dir}/dual_receipt.json", "w") as f:
-        json.dump(receipt, f, indent=2, default=str)
+    print("Building auditor packet...")
+    audit_md = build_auditor_packet(readout, receipt, norm, drift_ledger)
 
-    with open(f"{out_dir}/source_trace.json", "w") as f:
-        json.dump(trace, f, indent=2, default=str)
+    print_terminal(readout, receipt, norm, drift_ledger)
 
-    # Combined artifact
-    artifact = {
-        "artifact_type": "preservation_governance_artifact",
-        "created_by": "The Henry Company — Invariant Preservation Layer",
-        "source_trace": trace,
-        "preservation_readout": readout["preservation_readout"],
-        "receipt": receipt["receipt"],
+    out = "preservation_output"
+    os.makedirs(out, exist_ok=True)
+
+    saves = {
+        "source_trace.json": trace,
+        "normalized_trace.json": norm,
+        "preservation_readout.json": readout,
+        "drift_ledger.json": drift_ledger,
+        "dual_receipt.json": receipt,
+        "full_artifact.json": {
+            "artifact_type": "preservation_governance_artifact",
+            "created_by": "The Henry Company — Invariant Preservation Layer",
+            "compatibility": "DecisionAssure Runtime Governance",
+            "source_trace": trace,
+            "normalized_trace": norm,
+            "drift_ledger": drift_ledger["drift_ledger"],
+            "preservation_readout": readout["preservation_readout"],
+            "receipt": receipt["receipt"],
+        },
     }
-    with open(f"{out_dir}/full_artifact.json", "w") as f:
-        json.dump(artifact, f, indent=2, default=str)
+    for fname, data in saves.items():
+        with open(f"{out}/{fname}", "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2, default=str, ensure_ascii=False)
 
-    print(f"Saved: {out_dir}/preservation_readout.json")
-    print(f"Saved: {out_dir}/dual_receipt.json")
-    print(f"Saved: {out_dir}/source_trace.json")
-    print(f"Saved: {out_dir}/full_artifact.json")
-    print()
-    print("Send full_artifact.json to Akhilesh.")
+    with open(f"{out}/executive_summary.md", "w", encoding="utf-8") as f:
+        f.write(exec_md)
+    with open(f"{out}/auditor_packet.md", "w", encoding="utf-8") as f:
+        f.write(audit_md)
+
+    print("Files:")
+    for fname in sorted(os.listdir(out)):
+        sz = os.path.getsize(f"{out}/{fname}")
+        print(f"  {fname}: {sz/1024:.1f} KB")
+    print(f"\nSend full_artifact.json to Akhilesh.")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,143 @@
+{
+  "preservation_readout": {
+    "source_trace_id": "constitutional_live_1779945146",
+    "source_agent": "agent_alice",
+    "source_session": "session_live",
+    "analysis_timestamp": "2026-06-09T12:48:27.669317+00:00",
+    "preserved_object": "constitutional_continuity",
+    "single_source_truth": "The same authorized observer and reference frame must remain valid from authorization through commit.",
+    "drift_statement": "The agent (agent_alice) was admitted at step 1 (authorize) with observer identity dbc49ba9. At step 2 (memory_read), the observer identity changed to 95e1c046 without reauthorization. The first authorization survived as a record, but the authorized observer and reference frame did not survive the execution path. All subsequent steps were denied.",
+    "drift_points": [
+      {
+        "step_index": 2,
+        "step_name": "memory_read",
+        "phase": "execution",
+        "decision": "DENY",
+        "intent": "Read memory state",
+        "admissibility": 0.44999999999999996,
+        "observer": "95e1c0464a01",
+        "prev_observer": "dbc49ba9b0dd",
+        "frame": "cff9fa56f197",
+        "prev_frame": "cff9fa56f197",
+        "reason": "Constitutional continuity broken: reference_frame changed (True), observer_identity changed (False)"
+      },
+      {
+        "step_index": 3,
+        "step_name": "tool_call",
+        "phase": "execution",
+        "decision": "DENY",
+        "intent": "Call external API",
+        "admissibility": 0.0,
+        "observer": "e075b8e902a4",
+        "prev_observer": "dbc49ba9b0dd",
+        "frame": "cff9fa56f197",
+        "prev_frame": "cff9fa56f197",
+        "reason": "Constitutional continuity broken: reference_frame changed (True), observer_identity changed (False)"
+      },
+      {
+        "step_index": 4,
+        "step_name": "policy_mutation",
+        "phase": "state_change",
+        "decision": "DENY",
+        "intent": "Update policy version and delegation",
+        "admissibility": 0.0,
+        "observer": "e075b8e902a4",
+        "prev_observer": "dbc49ba9b0dd",
+        "frame": "33a6d6e0f3c3",
+        "prev_frame": "cff9fa56f197",
+        "reason": "Constitutional continuity broken: reference_frame changed (False), observer_identity changed (False)"
+      },
+      {
+        "step_index": 5,
+        "step_name": "retry",
+        "phase": "execution",
+        "decision": "DENY",
+        "intent": "Retry tool call",
+        "admissibility": 0.0,
+        "observer": "e075b8e902a4",
+        "prev_observer": "dbc49ba9b0dd",
+        "frame": "33a6d6e0f3c3",
+        "prev_frame": "cff9fa56f197",
+        "reason": "Constitutional continuity broken: reference_frame changed (False), observer_identity changed (False)"
+      },
+      {
+        "step_index": 6,
+        "step_name": "final_execute",
+        "phase": "commit",
+        "decision": "DENY",
+        "intent": "Commit changes",
+        "admissibility": 0.0,
+        "observer": "e075b8e902a4",
+        "prev_observer": "dbc49ba9b0dd",
+        "frame": "33a6d6e0f3c3",
+        "prev_frame": "cff9fa56f197",
+        "reason": "Constitutional continuity broken: reference_frame changed (False), observer_identity changed (False)"
+      }
+    ],
+    "observer_identity_trajectory": {
+      "unique": [
+        "dbc49ba9b0dd86a1",
+        "95e1c0464a01bbd5",
+        "e075b8e902a466e5"
+      ],
+      "mutations": 2
+    },
+    "reference_frame_trajectory": {
+      "unique": [
+        "cff9fa56f197e00b",
+        "33a6d6e0f3c32522"
+      ],
+      "mutations": 1
+    },
+    "failed_preservation_conditions": [
+      "authority_validity",
+      "causal_continuity",
+      "evidence_freshness",
+      "hidden_commitment_prevention",
+      "integrity",
+      "observer_identity_continuity",
+      "reference_frame_continuity",
+      "rollback_viability"
+    ],
+    "residuals": [
+      "Step 2 (memory_read): observer dbc49ba9→95e1c046",
+      "Step 3 (tool_call): observer dbc49ba9→e075b8e9",
+      "Step 4 (policy_mutation): observer dbc49ba9→e075b8e9",
+      "Step 4 (policy_mutation): frame cff9fa56→33a6d6e0",
+      "Step 5 (retry): observer dbc49ba9→e075b8e9",
+      "Step 5 (retry): frame cff9fa56→33a6d6e0",
+      "Step 6 (final_execute): observer dbc49ba9→e075b8e9",
+      "Step 6 (final_execute): frame cff9fa56→33a6d6e0",
+      "causal_continuity_persisted: false",
+      "integrity_status: CORRUPT",
+      "Observer mutated 3 identities: dbc49ba9 → 95e1c046 → e075b8e9",
+      "Frame mutated 2 states: cff9fa56 → 33a6d6e0"
+    ],
+    "hidden_commitments": {
+      "count": 5,
+      "at_steps": [
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    "human_accountable_readout": "The agent (agent_alice) was authorized to proceed with data retrieval. Between authorization and the first execution step, the observer identity changed. The system recognized this as a constitutional continuity violation and denied every subsequent step including the final commit. The agent did not fail because it misbehaved. It failed because the identity that was authorized was not the identity that tried to execute. The system correctly classified the trace as CORRUPT and denied the commit.",
+    "closure_statement": "Preserve constitutional continuity, not just the authorization event. Validation at t1 does not guarantee admissibility at t2.",
+    "reviewer_action": "Investigate why observer_identity_hash changed between authorization and execution. If legitimate (key rotation, session refresh), require explicit reauthorization. If illegitimate, flag as potential impersonation or injection attack.",
+    "statistics": {
+      "total_steps": 6,
+      "admitted": 1,
+      "denied": 5,
+      "continuity_breaks": 5,
+      "hidden_commitments": 5,
+      "rollback_viable": 1,
+      "evidence_fresh": 1,
+      "final_decision": "DENY",
+      "integrity_status": "CORRUPT",
+      "causal_continuity": false
+    },
+    "receipt_status": "preservation_failed_system_caught"
+  }
+}
